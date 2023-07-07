@@ -7,7 +7,14 @@ export class Apollo {
 
   private constructor() {
     const gateway = this.createGateway();
-    this.server = new ApolloServer({ gateway });
+    this.server = new ApolloServer({
+      gateway,
+      formatError: (err) => {
+        // log the error details to console or send it to logging service
+        console.log(err);
+        return err;
+      },
+    });
   }
 
   static getInstance(): Apollo {
@@ -24,6 +31,10 @@ export class Apollo {
           url,
           willSendRequest({ request, context }) {
             request.http?.headers.set("user", context.user ? JSON.stringify(context.user) : "");
+          },
+          didReceiveResponse({ response }) {
+            console.log(response.data); // logs the response from the service
+            return response;
           },
         });
       },
